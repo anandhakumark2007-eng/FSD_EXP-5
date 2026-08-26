@@ -3,89 +3,128 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simple Counter</title>
+<title>Sunset Counter</title>
 <style>
   * {
     box-sizing: border-box;
   }
-
   body {
     margin: 0;
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    font-family: 'Trebuchet MS', 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #ff9a8b, #ff6a88, #ff99ac, #fecfef);
+    background-size: 300% 300%;
+    animation: bgShift 12s ease infinite;
+    padding: 20px;
   }
-
+  @keyframes bgShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
   .card {
-    background: #ffffff;
-    padding: 40px 50px;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.85);
+    padding: 50px 70px;
+    border-radius: 32px;
+    box-shadow: 0 20px 50px rgba(255, 90, 130, 0.35);
     text-align: center;
+    width: 100%;
+    max-width: 600px;
+    animation: riseIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(40px) scale(0.9); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
   h1 {
-    margin: 0 0 20px;
-    color: #333;
+    margin: 0 0 6px;
     font-size: 20px;
-    letter-spacing: 1px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #ff5f7e;
   }
-
+  h1::after {
+    content: "☀";
+    display: inline-block;
+    margin-left: 8px;
+    animation: spinSun 6s linear infinite;
+  }
+  @keyframes spinSun {
+    to { transform: rotate(360deg); }
+  }
   #count {
-    font-size: 60px;
-    font-weight: bold;
-    color: #764ba2;
-    margin: 10px 0 30px;
-    min-width: 150px;
+    font-size: 110px;
+    font-weight: 800;
+    margin: 20px 0 40px;
+    line-height: 1;
+    color: #ff5f7e;
+    display: inline-block;
+    transition: color 0.2s ease;
   }
-
+  #count.bounce {
+    animation: bounce 0.5s cubic-bezier(0.36, 0, 0.66, 1.4);
+  }
+  @keyframes bounce {
+    0% { transform: scale(1) translateY(0); }
+    30% { transform: scale(1.3) translateY(-18px); }
+    55% { transform: scale(0.95) translateY(4px); }
+    75% { transform: scale(1.05) translateY(-4px); }
+    100% { transform: scale(1) translateY(0); }
+  }
   .buttons {
     display: flex;
-    gap: 12px;
+    gap: 20px;
     justify-content: center;
+    flex-wrap: wrap;
   }
-
   button {
     border: none;
-    border-radius: 8px;
-    padding: 12px 22px;
-    font-size: 20px;
+    border-radius: 50px;
+    padding: 18px 32px;
+    font-size: 26px;
+    font-weight: 700;
     cursor: pointer;
-    transition: transform 0.15s ease, opacity 0.15s ease;
     color: #fff;
+    background: linear-gradient(135deg, #ff9a8b, #ff5f7e);
+    box-shadow: 0 8px 20px rgba(255, 95, 126, 0.5);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+    min-width: 90px;
   }
-
+  button.decrease {
+    background: linear-gradient(135deg, #a18cd1, #fbc2eb);
+    box-shadow: 0 8px 20px rgba(161, 140, 209, 0.5);
+  }
+  button.reset {
+    background: #fff;
+    color: #ff5f7e;
+    border: 2px solid #ffd3da;
+    font-size: 16px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-shadow: none;
+  }
+  button:hover {
+    transform: translateY(-6px) scale(1.05) rotate(-2deg);
+    box-shadow: 0 14px 26px rgba(255, 95, 126, 0.55);
+  }
+  button.decrease:hover {
+    box-shadow: 0 14px 26px rgba(161, 140, 209, 0.55);
+  }
+  button.reset:hover {
+    transform: translateY(-4px) scale(1.03);
+  }
   button:active {
     transform: scale(0.92);
-  }
-
-  .increase {
-    background: #4CAF50;
-  }
-
-  .decrease {
-    background: #f44336;
-  }
-
-  .reset {
-    background: #555;
-    font-size: 15px;
-  }
-
-  button:hover {
-    opacity: 0.9;
   }
 </style>
 </head>
 <body>
-
   <div class="card">
-    <h1>SIMPLE COUNTER APP</h1>
-   <hr>
-   <h3>+ increases, - decreases</h3>
+    <h1>Sunset Counter</h1>
     <div id="count">0</div>
     <div class="buttons">
       <button class="decrease" onclick="changeCount(-1)">−</button>
@@ -93,10 +132,15 @@
       <button class="increase" onclick="changeCount(1)">+</button>
     </div>
   </div>
-
   <script>
     let count = 0;
     const countDisplay = document.getElementById('count');
+
+    function bump() {
+      countDisplay.classList.remove('bounce');
+      void countDisplay.offsetWidth;
+      countDisplay.classList.add('bounce');
+    }
 
     function changeCount(amount) {
       count += amount;
@@ -110,8 +154,8 @@
 
     function updateDisplay() {
       countDisplay.textContent = count;
+      bump();
     }
   </script>
-
 </body>
 </html>
